@@ -1,33 +1,46 @@
-import { Game } from "../scenes/Game"
+import { Game1 } from "../scenes/Game1"
 import * as p from 'planck'
 
 export class Obj extends Phaser.GameObjects.Rectangle {
 
-    scene: Game
+    scene: Game1
     pBody: p.Body
 
     inputElm: Phaser.GameObjects.DOMElement
     leftVectorLine: Phaser.GameObjects.Line
     rightVectorLine: Phaser.GameObjects.Line
 
-    constructor(scene: Game, x: number, y: number, width: number, height: number, color: number){
+    constructor(scene: Game1, x: number, y: number, width: number, height: number, color: number, inputHTML: string){
         super(scene, x, y, width, height, color)
         this.setStrokeStyle(2, color-0x111111)
 
         this.scene = scene
         this.scene.add.existing(this)
 
-        this.pBody = scene.world.createDynamicBody(new p.Vec2(x/320, y/320))
+        this.pBody = scene.world.createDynamicBody({
+            position: new p.Vec2(x/320, y/320),
+            fixedRotation: true
+        })
         let fixture = this.pBody.createFixture({
             shape: new p.Box(width/320/2, height/320/2),
-            friction: 0.3
+            friction: 0.3,
         })
 
-        this.inputElm = scene.add.dom(x, y-200).createFromCache('input-obj')
+        this.pBody.setMassData({
+            mass: 1,
+            center: new p.Vec2(0, 0),
+            I: 1,
+        })
+
+        this.pBody.setFixedRotation(false)
+
+        this.inputElm = scene.add.dom(x, y-200).createFromCache(inputHTML)
+        this.inputElm.setName(inputHTML)
 
         const massaElm = this.inputElm.getChildByName('massa') as HTMLInputElement
         const koefGesekBendaElm = this.inputElm.getChildByName('koef-gesek-benda') as HTMLInputElement
         const koefGesekLantaiElm = this.inputElm.getChildByName('koef-gesek-lantai') as HTMLInputElement
+        const sudutLantaiElm = this.inputElm.getChildByName('sudut-lantai') as HTMLInputElement | undefined
         const gayaKiriElm = this.inputElm.getChildByName('gaya-kiri') as HTMLInputElement
         const sudutKiriElm = this.inputElm.getChildByName('sudut-kiri') as HTMLInputElement
         const gayaKananElm = this.inputElm.getChildByName('gaya-kanan') as HTMLInputElement
@@ -41,7 +54,7 @@ export class Obj extends Phaser.GameObjects.Rectangle {
             this.pBody.setMassData({
                 mass: massa,
                 center: new p.Vec2(0, 0),
-                I: 1,
+                I: 0,
             })
         }
 
@@ -50,6 +63,7 @@ export class Obj extends Phaser.GameObjects.Rectangle {
 
             if((parseFloat(koefGesekBendaElm.value) || 0) > 1) koefGesekBendaElm.value = '1';
             const koefGesek = parseFloat(koefGesekBendaElm.value) || 0
+            koefGesekBendaElm.nextElementSibling!.innerHTML = `μ = ${koefGesek}`
 
             this.pBody.destroyFixture(fixture)
             fixture = this.pBody.createFixture({
@@ -63,8 +77,24 @@ export class Obj extends Phaser.GameObjects.Rectangle {
 
             if((parseFloat(koefGesekLantaiElm.value) || 0) > 1) koefGesekLantaiElm.value = '1';
             const koefGesek = parseFloat(koefGesekLantaiElm.value) || 0
+            koefGesekLantaiElm.nextElementSibling!.innerHTML = `μ = ${koefGesek}`
 
             this.scene.ground.setFriction(koefGesek)
+        }
+
+        if(sudutLantaiElm) sudutLantaiElm.oninput = () => {
+            sudutLantaiElm.value = sudutLantaiElm.value.replace(/(?![0-9.])./gmi,'')
+
+            if((parseFloat(sudutLantaiElm.value) || 0) > 90) sudutLantaiElm.value = '90';
+            if((parseFloat(sudutLantaiElm.value) || 0) < -90) sudutLantaiElm.value = '-90';
+            const sudutLantai = parseFloat(sudutLantaiElm.value) || 0
+
+            this.scene.ground.pBody.setAngle(Phaser.Math.DegToRad(sudutLantai))
+            this.pBody.setAngle(Phaser.Math.DegToRad(sudutLantai))
+
+            this.pBody.applyForceToCenter(new p.Vec2(0, 0))
+            
+            this.pBody.setActive(false)
         }
 
         let gayaKiri = 0
@@ -121,7 +151,11 @@ export class Obj extends Phaser.GameObjects.Rectangle {
             const x = Math.cos((sudutKiri+sudutKanan)*(Math.PI/180))*gaya
             const y = Math.sin((sudutKiri+sudutKanan)*(Math.PI/180))*gaya
             const vel = new p.Vec2(x, y)
+
+            this.pBody.setActive(true)
             this.pBody.applyForceToCenter(vel)
+
+            console.log(this.pBody.getAngle())
         })
 
         
@@ -133,6 +167,8 @@ export class Obj extends Phaser.GameObjects.Rectangle {
         this.setX(pos.x*320)
         this.setY(pos.y*320)
 
+        this.setRotation(this.pBody.getAngle())
+
         this.leftVectorLine.setPosition(this.x, this.y)
         this.rightVectorLine.setPosition(this.x, this.y)
 
@@ -140,7 +176,8 @@ export class Obj extends Phaser.GameObjects.Rectangle {
             const scene = this.scene
             this.destroy()
             setTimeout(() => {
-                scene.obj = new Obj(scene, 640, 400, 32, 32, 0x22aa88)
+                scene.obj = new Obj(scene, 640, 400, 32, 32, 0x22aa88, this.inputElm.name)
+                scene.ground.pBody.setAngle(0)
             }, 500)
         }
     }

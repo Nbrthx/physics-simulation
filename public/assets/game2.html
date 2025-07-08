@@ -1,12 +1,23 @@
 <div>
-    Massa (Kg): <input name="massa" placeholder="Massa Benda" value="1"><br />
-    Koefisien Gesek Benda (μ): <input name="koef-gesek-benda" placeholder="Koefisien Gesek Benda" value="0.3"><br />
-    Koefisien Gesek Lantai(μ): <input name="koef-gesek-lantai" placeholder="Koefisien Gesek Lantai" value="0.3"><br />
+    Massa (Kg):
+    <input name="massa" placeholder="Massa Benda" value="1"><br />
+
+    Koefisien Gesek Benda (μ):
+    <input type="range" min="0" max="1" step="0.01" name="koef-gesek-benda" placeholder="Koefisien Gesek Benda" value="0.3"><label>μ = 0.3</label><br />
+
+    Koefisien Gesek Lantai(μ):
+    <input type="range" min="0" max="1" step="0.01" name="koef-gesek-lantai" placeholder="Koefisien Gesek Lantai" value="0.3"><label>μ = 0.3</label><br />
+    
+    Sudut Lantai (°): <input name="sudut-lantai" placeholder="Besar Sudut Lantai" value="0">
+    <br /><br />
+
     <br/>
     Sudut Kiri (°)<label class="space"></label>
     Gaya Kiri (N)<label class="space"></label>
     Gaya Kanan (N)<label class="space"></label>
-    Sudut Kanan (°)<br />
+    Sudut Kanan (°)
+    <br />
+
     <input name="sudut-kiri" placeholder="Besar Sudut Kiri" value="0">
     <input name="gaya-kiri" placeholder="Besar Gaya Kiri" value="0">
     <label class="space"></label><label class="space"></label>

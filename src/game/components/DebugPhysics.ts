@@ -1,7 +1,6 @@
-import { Game } from "../scenes/Game";
 import * as p from 'planck'
 
-export function createDebugGraphics(scene: Game, debugGraphics: Phaser.GameObjects.Graphics) {
+export function createDebugGraphics(scene: Phaser.Scene & { world: p.World }, debugGraphics: Phaser.GameObjects.Graphics) {
     debugGraphics.clear()
 
     for (let body = scene.world.getBodyList(); body; body = body.getNext()) {
