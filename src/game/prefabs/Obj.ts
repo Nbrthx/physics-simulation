@@ -125,10 +125,10 @@ export class Obj extends Phaser.GameObjects.Rectangle {
 
             const headangle = 15;
 
-            const head1x = (length*4-4) * Math.cos(Phaser.Math.DegToRad(0 + headangle));
-            const head1y = Math.min(length*3, 4*4) * Math.sin(Phaser.Math.DegToRad(0 + headangle));
-            const head2x = (length*4-4) * Math.cos(Phaser.Math.DegToRad(0 - headangle));
-            const head2y = Math.min(length*3, 4*4) * Math.sin(Phaser.Math.DegToRad(0 - headangle));
+            const head1x = Math.cos(angle) > 0 ? (length*4-8) : (length*4+8);
+            const head1y = Math.max(Math.min(length*3, 4*4), -4*4) * Math.sin(Phaser.Math.DegToRad(0 + headangle));
+            const head2x = Math.cos(angle) > 0 ? (length*4-8) : (length*4+8);
+            const head2y = Math.max(Math.min(length*3, 4*4), -4*4) * Math.sin(Phaser.Math.DegToRad(0 - headangle));
 
             arrow[1].setTo(length*4, 0, head1x, head1y, head2x, head2y)
             arrow[1].setRotation(Phaser.Math.DegToRad(angle));
