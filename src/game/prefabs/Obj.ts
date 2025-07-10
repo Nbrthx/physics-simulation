@@ -7,8 +7,8 @@ export class Obj extends Phaser.GameObjects.Rectangle {
     pBody: p.Body
 
     inputElm: Phaser.GameObjects.DOMElement
-    leftVectorLine: Phaser.GameObjects.Line
-    rightVectorLine: Phaser.GameObjects.Line
+    leftVectorLine: [Phaser.GameObjects.Line, Phaser.GameObjects.Triangle]
+    rightVectorLine: [Phaser.GameObjects.Line, Phaser.GameObjects.Triangle]
 
     constructor(scene: Game1, x: number, y: number, width: number, height: number, color: number, inputHTML: string){
         super(scene, x, y, width, height, color)
@@ -102,20 +102,37 @@ export class Obj extends Phaser.GameObjects.Rectangle {
         let sudutKiri = 0
         let sudutKanan = 0
 
-        const createVectorLine = (x: number, y: number, length: number, angle: number, color: number) => {
+        const createVectorLine = (x: number, y: number, length: number, angle: number, color: number): [Phaser.GameObjects.Line, Phaser.GameObjects.Triangle] => {
             const line = this.scene.add.line(0, 0, 0, 0, length*4, 0, color);
             line.setOrigin(0, 0.5);
             line.rotation = Phaser.Math.DegToRad(angle);
             line.setPosition(x, y);
-            return line;
+
+            const triangle = this.scene.add.triangle(0, 0, 0, 0, 0, 0, 0, 0, color);
+            triangle.setOrigin(0, 0.5);
+            triangle.rotation = Phaser.Math.DegToRad(-angle);
+            triangle.setPosition(x, y);
+
+            return [line, triangle];
         };
 
         this.leftVectorLine = createVectorLine(this.x, this.y, gayaKiri, sudutKiri, 0xff0000);
         this.rightVectorLine = createVectorLine(this.x, this.y, gayaKanan, sudutKanan, 0x0000ff);
 
-        const updateVectorLine = (line: Phaser.GameObjects.Line, length: number, angle: number) => {
-            line.setTo(0, 0, length*4, 0);
-            line.rotation = Phaser.Math.DegToRad(angle);
+        const updateVectorLine = (arrow: [Phaser.GameObjects.Line, Phaser.GameObjects.Triangle], length: number, angle: number) => {
+            arrow[0].setTo(0, 0, length*4, 0);
+            arrow[0].setRotation(Phaser.Math.DegToRad(angle));
+
+            const headangle = 15;
+
+            const head1x = length*3 * Math.cos(Phaser.Math.DegToRad(0 + headangle));
+            const head1y = length*3 * Math.sin(Phaser.Math.DegToRad(0 + headangle));
+            const head2x = length*3 * Math.cos(Phaser.Math.DegToRad(0 - headangle));
+            const head2y = length*3 * Math.sin(Phaser.Math.DegToRad(0 - headangle));
+
+            arrow[1].setTo(length*4, 0, head1x, head1y, head2x, head2y)
+            arrow[1].setRotation(Phaser.Math.DegToRad(angle));
+
         };
 
         gayaKiriElm.oninput = () => {
@@ -147,9 +164,8 @@ export class Obj extends Phaser.GameObjects.Rectangle {
         };
 
         this.inputElm.getChildByName('apl')?.addEventListener('click', () => {
-            const gaya = gayaKiri*10+gayaKanan*10
-            const x = Math.cos((sudutKiri+sudutKanan)*(Math.PI/180))*gaya
-            const y = Math.sin((sudutKiri+sudutKanan)*(Math.PI/180))*gaya
+            const x = Math.cos(sudutKiri*(Math.PI/180))*gayaKiri*10+Math.cos(sudutKanan*(Math.PI/180))*gayaKanan*10
+            const y = Math.sin(sudutKiri*(Math.PI/180))*gayaKiri*10+Math.sin(sudutKanan*(Math.PI/180))*gayaKanan*10
             const vel = new p.Vec2(x, y)
 
             this.pBody.setActive(true)
@@ -169,8 +185,10 @@ export class Obj extends Phaser.GameObjects.Rectangle {
 
         this.setRotation(this.pBody.getAngle())
 
-        this.leftVectorLine.setPosition(this.x, this.y)
-        this.rightVectorLine.setPosition(this.x, this.y)
+        this.leftVectorLine[0].setPosition(this.x, this.y)
+        this.leftVectorLine[1].setPosition(this.x, this.y)
+        this.rightVectorLine[0].setPosition(this.x, this.y)
+        this.rightVectorLine[1].setPosition(this.x, this.y)
 
         if(this.active && this.y > 1024){
             const scene = this.scene

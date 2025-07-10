@@ -42,7 +42,7 @@ export class Game2 extends Scene{
         this.ground = new Ground(this, 640, 560, 800, 120, 0x888888)
         this.obj = new Obj(this, 640, 400, 32, 32, 0x22aa88, 'input2')
         
-        this.accelText = this.add.text(this.obj.x, this.obj.y - 50, '0', { fontSize: 24, color: '#000000' }).setDepth(1).setOrigin(0.5);
+        this.accelText = this.add.text(this.obj.x, this.obj.y - 50, '0 m/s²', { fontSize: 24, color: '#000000' }).setDepth(1).setOrigin(0.5);
         
         this.input.keyboard?.on('keydown-SPACE', () => {
             this.debugGraphics.setVisible(!this.debugGraphics.visible)
@@ -61,7 +61,7 @@ export class Game2 extends Scene{
         const accel = Math.sqrt(this.obj.pBody.getLinearVelocity().x**2 + this.obj.pBody.getLinearVelocity().y**2)
 
         this.accelText.setPosition(this.obj.x, this.obj.y - 50)
-        this.accelText.setText(`${accel.toFixed(2)}`)
+        this.accelText.setText(`${accel.toFixed(2)} m/s²`)
 
         createDebugGraphics(this, this.debugGraphics)
     }
