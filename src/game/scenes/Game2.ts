@@ -26,7 +26,7 @@ export class Game2 extends Scene{
     }
 
     create (){
-        this.world = new p.World({ gravity: new p.Vec2(0, 9.8) })
+        this.world = new p.World({ gravity: new p.Vec2(0, 10) })
         this.debugGraphics = this.add.graphics().setDepth(100000000000).setVisible(false)
 
         const menuElm = this.add.dom(this.scale.width-50, 200).createFromCache('menu').setOrigin(1, 0.5)

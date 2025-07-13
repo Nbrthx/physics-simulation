@@ -164,14 +164,12 @@ export class Obj extends Phaser.GameObjects.Rectangle {
         };
 
         this.inputElm.getChildByName('apl')?.addEventListener('click', () => {
-            const x = Math.cos(sudutKiri*(Math.PI/180))*gayaKiri*10+Math.cos(sudutKanan*(Math.PI/180))*gayaKanan*10
-            const y = Math.sin(sudutKiri*(Math.PI/180))*gayaKiri*10+Math.sin(sudutKanan*(Math.PI/180))*gayaKanan*10
+            const x = Math.cos(sudutKiri*(Math.PI/180))*gayaKiri+Math.cos(sudutKanan*(Math.PI/180))*gayaKanan
+            const y = Math.sin(sudutKiri*(Math.PI/180))*gayaKiri+Math.sin(sudutKanan*(Math.PI/180))*gayaKanan
             const vel = new p.Vec2(x, y)
 
             this.pBody.setActive(true)
             this.pBody.applyForceToCenter(vel)
-
-            console.log(this.pBody.getAngle())
         })
 
         
